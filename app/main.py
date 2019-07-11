@@ -40,27 +40,54 @@ def move():
 
 def getSnake(gameState, id):
    for snake in gameState["snakes"]:
-       if snake["id"] == id :
+       if snake["id"] == id:
         return snake
+
+def avoidCollision(snake, move):
+    head_x, head_y = snake["coords"][0]
+    if move is "left":
+        # x coord
+        new_head = [head_x - 1, head_y]
+        if new_head in snake["coords"]:
+            return False
+    if move is "right":
+        # x coord
+        new_head = [head_x + 1, head_y]
+        if new_head in snake["coords"]:
+            return False
+    if move is "up":
+        # x coord
+        new_head = [head_x, head_y + 1]
+        if new_head in snake["coords"]:
+            return False
+    if move is "down":
+        # x coord
+        new_head = [head_x, head_y - 1]
+        if new_head in snake["coords"]:
+            return False
+    return True
+
+
 def findFood(gameState):
 
   mySnake = getSnake(gameState, gameState["you"])
   head = mySnake["coords"][0]
-  if gameState["food"][0][0] < head[0]: 
+
+  move = None
+
+  if gameState["food"][0][0] < head[0] and avoidCollision(mySnake, "left"):
         move = "left"
 
-
-  if gameState["food"][0][0] > head[0]:
+  if gameState["food"][0][0] > head[0] and avoidCollision(mySnake, "right"):
         move = "right"
 
-
-  if gameState["food"][0][1] < head[1]:
+  if gameState["food"][0][1] < head[1] and avoidCollision(mySnake, "up"):
         move = "up"
 
-
-  if gameState["food"][0][1] > head[1]:
+  if gameState["food"][0][1] > head[1] and avoidCollision(mySnake, "down"):
         move = "down"
-  return move 
+  print move
+  return move
 
 # Expose WSGI app (so gunicorn can find it)
 application = bottle.default_app()
