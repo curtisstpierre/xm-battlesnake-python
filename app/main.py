@@ -84,7 +84,7 @@ def space_available(move, gameState):
     mySnake = getSnake(gameState, gameState["you"])
     head_x, head_y = mySnake["coords"][0]
     illegal_moves = takenSpaces(gameState)
-    count_space = 0
+    count = 0
     if move is 'left':
         while head_x > 0:
             head_x = head_x - 1
