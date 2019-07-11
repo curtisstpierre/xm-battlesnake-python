@@ -67,7 +67,7 @@ def findOptimalPath(gameState):
     available_moves = availableMoves(gameState)
     optimal_move_count = 0
     optimal_move = None
-    for move in availableMoves:
+    for move in available_moves:
         move_count = space_available(move, gameState)
         print move, move_count
         if move_count > optimal_move_count:
