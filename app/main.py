@@ -40,10 +40,18 @@ def start():
 
 @bottle.post('/move')
 def move():
+    global board_width
+    global board_height
     data = bottle.request.json
+    board_width = data['width']
+    board_height = data['height']
+    print board_width, board_height
     next_move = findFood(data)
     if next_move is None:
+        print next_move
         next_move = findSafePlace(data)
+
+    print next_move
     return {
         'move': next_move,
         'taunt': 'Come get some!'
@@ -55,11 +63,13 @@ def getSnake(gameState, id):
         if snake["id"] == id:
             return snake
 
+
 def takenSpaces(gameState):
     spaces = []
     snakes = gameState["snakes"]
     for snake in snakes:
         spaces += snake["coords"]
+    print "taken ", spaces
     return spaces
 
 
@@ -73,11 +83,8 @@ def findOptimalPath(gameState):
         if move_count > optimal_move_count:
             optimal_move_count = move_count
             optimal_move = move
-
+    print "optimal move", optimal_move
     return optimal_move
-
-
-
 
 
 def space_available(move, gameState):
@@ -122,24 +129,28 @@ def availableMoves(gameState):
     for snake in snakes:
         head_x, head_y = snake["coords"][0]
         new_head = [head_x - 1, head_y]
+        print new_head
         if 0 > head_x - 1 or new_head in snake["coords"]:
             try:
                 options.remove('left')
             except:
                 pass
         new_head = [head_x + 1, head_y]
+        print new_head
         if board_width <= head_x + 1 or new_head in snake["coords"]:
             try:
                 options.remove('right')
             except:
                 pass
         new_head = [head_x, head_y - 1]
+        print new_head
         if 0 > head_y - 1 or new_head in snake["coords"]:
             try:
                 options.remove('up')
             except:
                 pass
         new_head = [head_x, head_y + 1]
+        print new_head
         if board_height <= head_y + 1 or new_head in snake["coords"]:
             try:
                 options.remove('down')
@@ -179,10 +190,14 @@ def findFood(gameState):
     mySnake = getSnake(gameState, gameState["you"])
     head = mySnake["coords"][0]
 
+    global optimal_move
+
     available_moves = availableMoves(gameState)
     move = None
-    if optimal_move and gameState["food"][0][0] < head[0] and optimal_move in available_moves:
-            move = findOptimalPath(gameState)
+    opt_move = findOptimalPath(gameState)
+    if mySnake["health_points"] > 50 and opt_move in available_moves:
+            move = opt_move
+            return move
 
     if gameState["food"][0][0] < head[0] and "left" in available_moves:
         move = "left"
@@ -196,7 +211,6 @@ def findFood(gameState):
     if gameState["food"][0][1] > head[1] and "down" in available_moves:
         move = "down"
 
-    global optimal_move
     optimal_move = move
     return move
 
