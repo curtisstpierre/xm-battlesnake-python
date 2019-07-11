@@ -44,7 +44,6 @@ def move():
     next_move = findFood(data)
     if next_move is None:
         next_move = findSafePlace(data)
-    print next_move
     return {
         'move': next_move,
         'taunt': 'Come get some!'
@@ -70,6 +69,7 @@ def findOptimalPath(gameState):
     optimal_move = None
     for move in availableMoves:
         move_count = space_available(move, gameState)
+        print move, move_count
         if move_count > optimal_move_count:
             optimal_move_count = move_count
             optimal_move = move
@@ -133,7 +133,6 @@ def availableMoves(gameState):
         new_head = [head_x, head_y + 1]
         if board_height <= head_y + 1 or new_head in snake["coords"]:
             options.remove('down')
-        print options
     return options
 
 
@@ -170,7 +169,6 @@ def findFood(gameState):
 
     available_moves = availableMoves(gameState)
     move = None
-    print available_moves
     if optimal_move and gameState["food"][0][0] < head[0] and optimal_move in available_moves:
             move = findOptimalPath(gameState)
 
