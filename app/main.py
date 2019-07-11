@@ -123,16 +123,28 @@ def availableMoves(gameState):
         head_x, head_y = snake["coords"][0]
         new_head = [head_x - 1, head_y]
         if 0 > head_x - 1 or new_head in snake["coords"]:
-            options.remove('left')
+            try:
+                options.remove('left')
+            except:
+                pass
         new_head = [head_x + 1, head_y]
         if board_width <= head_x + 1 or new_head in snake["coords"]:
-            options.remove('right')
+            try:
+                options.remove('right')
+            except:
+                pass
         new_head = [head_x, head_y - 1]
         if 0 > head_y - 1 or new_head in snake["coords"]:
-            options.remove('up')
+            try:
+                options.remove('up')
+            except:
+                pass
         new_head = [head_x, head_y + 1]
         if board_height <= head_y + 1 or new_head in snake["coords"]:
-            options.remove('down')
+            try:
+                options.remove('down')
+            except:
+                pass
     return options
 
 
