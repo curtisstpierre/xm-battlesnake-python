@@ -1,10 +1,13 @@
 import bottle
 import os
 import random
+import pprint
+
+pp = pprint.PrettyPrinter(indent=4)
 
 board_width = None
 board_height = None
-last_move = None
+optimal_move = None
 
 @bottle.route('/static/<path:path>')
 def static(path):
@@ -29,16 +32,15 @@ def start():
 
     return {
         'color': '#00FF00',
-        'taunt': 'Get your neck chopped!',
+        'taunt': 'Let it burn!',
         'head_url': head_url,
-        'name': 'NinjaGaiden Snake'
+        'name': 'Dumpster Snake'
     }
 
 
 @bottle.post('/move')
 def move():
     data = bottle.request.json
-
     next_move = findFood(data)
     if next_move is None:
         next_move = findSafePlace(data)
@@ -53,6 +55,65 @@ def getSnake(gameState, id):
     for snake in gameState["snakes"]:
         if snake["id"] == id:
             return snake
+
+def takenSpaces(gameState):
+    spaces = []
+    snakes = gameState["snakes"]
+    for snake in snakes:
+        spaces += snake["coords"]
+    return spaces
+
+
+def findOptimalPath(gameState):
+    available_moves = availableMoves(gameState)
+    optimal_move_count = 0
+    optimal_move = None
+    for move in availableMoves:
+        move_count = space_available(move, gameState)
+        if move_count > optimal_move_count:
+            optimal_move_count = move_count
+            optimal_move = move
+
+    return optimal_move
+
+
+
+
+
+def space_available(move, gameState):
+    mySnake = getSnake(gameState, gameState["you"])
+    head_x, head_y = mySnake["coords"][0]
+    illegal_moves = takenSpaces(gameState)
+    count_space = 0
+    if move is 'left':
+        while head_x > 0:
+            head_x = head_x - 1
+            if [head_x, head_y] in illegal_moves:
+                return count
+            else:
+                count += 1
+    if move is 'right':
+        while head_x < board_width:
+            head_x = head_x + 1
+            if [head_x, head_y] in illegal_moves:
+                return count
+            else:
+                count += 1
+    if move is 'up':
+        while head_y > 0:
+            head_y = head_y - 1
+            if [head_x, head_y] in illegal_moves:
+                return count
+            else:
+                count += 1
+    if move is 'down':
+        while head_y < board_height:
+            head_y = head_y + 1
+            if [head_x, head_y] in illegal_moves:
+                return count
+            else:
+                count += 1
+    return count
 
 
 def availableMoves(gameState):
@@ -110,8 +171,8 @@ def findFood(gameState):
     available_moves = availableMoves(gameState)
     move = None
     print available_moves
-    if last_move and gameState["food"][0][0] < head[0] and last_move in available_moves:
-            move = last_move
+    if optimal_move and gameState["food"][0][0] < head[0] and optimal_move in available_moves:
+            move = findOptimalPath(gameState)
 
     if gameState["food"][0][0] < head[0] and "left" in available_moves:
         move = "left"
@@ -125,8 +186,8 @@ def findFood(gameState):
     if gameState["food"][0][1] > head[1] and "down" in available_moves:
         move = "down"
 
-    global last_move
-    last_move = move
+    global optimal_move
+    optimal_move = move
     return move
 
 
